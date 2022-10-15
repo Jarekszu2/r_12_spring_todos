@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class TodoTaskService {
@@ -31,13 +32,71 @@ public class TodoTaskService {
         }
     }
 
-    public Set<TodoTask> getAll(String userName) {
+    public Set<TodoTask> getAllCurrent(String userName) {
         Optional<Account> optionalAccount = accountRepository.findByUsername(userName);
         if (optionalAccount.isPresent()) {
             Account userAccount = optionalAccount.get();
 
-            return userAccount.getTasks();
+            return userAccount
+                    .getTasks()
+                    .stream()
+                    .filter(task -> task.getTaskStatus() != TaskStatus.ARCHIVED)
+                    .collect(Collectors.toSet());
         }
         return new HashSet<>();
+    }
+
+    public Set<TodoTask> getAllArchived(String userName) {
+        Optional<Account> optionalAccount = accountRepository.findByUsername(userName);
+        if (optionalAccount.isPresent()) {
+            Account userAccount = optionalAccount.get();
+
+            return userAccount
+                    .getTasks()
+                    .stream()
+                    .filter(task -> task.getTaskStatus() == TaskStatus.ARCHIVED)
+                    .collect(Collectors.toSet());
+        }
+        return new HashSet<>();
+    }
+
+    public void setDone(Long doneId, String userName) {
+        if (!userIsOwnerOf(userName, doneId)){
+            return;
+        }
+
+        Optional<TodoTask> optionalTodoTask = todoTaskRepository.findById(doneId);
+        if (optionalTodoTask.isPresent() && optionalTodoTask.get().getTaskStatus() != TaskStatus.ARCHIVED) {
+            TodoTask todoTask = optionalTodoTask.get();
+            todoTask.setTaskStatus(TaskStatus.DONE);
+
+            todoTaskRepository.save(todoTask);
+        }
+    }
+
+    public void setArchive(Long doneId, String userName) {
+        if (!userIsOwnerOf(userName, doneId)){
+            return;
+        }
+
+        Optional<TodoTask> optionalTodoTask = todoTaskRepository.findById(doneId);
+        if (optionalTodoTask.isPresent() && optionalTodoTask.get().getTaskStatus() == TaskStatus.DONE) {
+            TodoTask todoTask = optionalTodoTask.get();
+            todoTask.setTaskStatus(TaskStatus.ARCHIVED);
+
+            todoTaskRepository.save(todoTask);
+        }
+    }
+
+    public boolean userIsOwnerOf(String userName, Long taskId){
+        Optional<Account> optionalAccount = accountRepository.findByUsername(userName);
+        if (optionalAccount.isPresent()){
+            Account user = optionalAccount.get();
+
+            return user.getTasks()
+                    .stream()
+                    .anyMatch(task -> task.getId() == taskId);
+        }
+        return false;
     }
 }
