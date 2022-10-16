@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,6 +70,7 @@ public class TodoTaskService {
         if (optionalTodoTask.isPresent() && optionalTodoTask.get().getTaskStatus() != TaskStatus.ARCHIVED) {
             TodoTask todoTask = optionalTodoTask.get();
             todoTask.setTaskStatus(TaskStatus.DONE);
+            todoTask.setDateFinished(LocalDate.now());
 
             todoTaskRepository.save(todoTask);
         }
@@ -88,7 +90,22 @@ public class TodoTaskService {
         }
     }
 
-    public boolean userIsOwnerOf(String userName, Long taskId){
+    public void setToDo(Long doneId, String userName) {
+        if (!userIsOwnerOf(userName, doneId)){
+            return;
+        }
+
+        Optional<TodoTask> optionalTodoTask = todoTaskRepository.findById(doneId);
+        if (optionalTodoTask.isPresent() && optionalTodoTask.get().getTaskStatus() == TaskStatus.DONE) {
+            TodoTask todoTask = optionalTodoTask.get();
+            todoTask.setTaskStatus(TaskStatus.TODO);
+            todoTask.setDateFinished(null);
+
+            todoTaskRepository.save(todoTask);
+        }
+    }
+
+    private boolean userIsOwnerOf(String userName, Long taskId){
         Optional<Account> optionalAccount = accountRepository.findByUsername(userName);
         if (optionalAccount.isPresent()){
             Account user = optionalAccount.get();

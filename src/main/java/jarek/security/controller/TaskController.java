@@ -57,6 +57,13 @@ public class TaskController {
         return "redirect:/task/list";
     }
 
+    @GetMapping("/todo/{id}")
+    public String setToDo(@PathVariable("id") Long doneId, Principal principal) {
+        todoTaskService.setToDo(doneId, principal.getName());
+
+        return "redirect:/task/list";
+    }
+
     @GetMapping("/archive/{id}")
     public String setArchive(@PathVariable("id") Long archiveId, Principal principal) {
         todoTaskService.setArchive(archiveId, principal.getName());
