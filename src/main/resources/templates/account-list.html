@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Account list</title>
@@ -21,15 +21,15 @@
             <div class="col-2" th:text="${account.getUsername()}"></div>
             <div class="col-4" th:text="${account.getAccountRoles()}"></div>
             <div class="row col-5">
-                <div class="col-3">
+                <div class="col-3" sec:authorize="hasAnyRole('ACCOUNT_REMOVER','ADMIN')">
                     <a th:href="@{/admin/account/remove(accountId=${account.getId()})}">
                         <!--<button th:disabled="${accountId.isAdmin()}" type="button" class="btn btn-danger">Remove</button>-->
                         <button  type="button" class="btn btn-danger">Remove</button>
                     </a>
                 </div>
-                <div class="col-3">
+                <div class="col-3" sec:authorize="hasAnyRole('ACCOUNT_MANAGER', 'ADMIN')">
                     <a th:href="@{/admin/account/toggleLock(accountId=${account.getId()})}">
-                        <button type="button" class="btn btn-primary" th:text="${account.isLocked()? 'Unlock': '-  Lock  -'}"></button>
+                        <button type="button" class="btn btn-primary" th:text="${account.isLocked()? 'Unlock': '-Lock-'}"></button>
                     </a>
                 </div>
                 <!--<div class="col-3">-->
@@ -37,12 +37,12 @@
                         <!--<button type="button" class="btn btn-primary">LockLock</button>-->
                     <!--</a>-->
                 <!--</div>-->
-                <div class="col-3">
+                <div class="col-3" sec:authorize="hasRole('ADMIN')">
                     <a th:href="@{/admin/account/resetPassword(accountId=${account.getId()})}">
                         <button type="button" class="btn btn-primary">Reset Password</button>
                     </a>
                 </div>
-                <div class="col-3">
+                <div class="col-3" sec:authorize="hasRole('ADMIN')">
                     <a th:href="@{/admin/account/editRoles(accountId=${account.getId()})}">
                         <button type="button" class="btn btn-primary">Edit roles</button>
                     </a>

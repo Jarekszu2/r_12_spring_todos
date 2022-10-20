@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @Controller
 @RequestMapping(path = "/admin/account")
-@PreAuthorize(value = "hasRole('ADMIN')")
+//@PreAuthorize(value = "hasRole('ADMIN')")
 public class AdminAccountController {
 
     private AccountService accountService;
@@ -30,6 +30,7 @@ public class AdminAccountController {
     }
 
     @GetMapping(path = "/list")
+    @PreAuthorize(value = "hasAnyRole('ACCOUNT_MANAGER','ADMIN')")
     public String getUserList(Model model) {
         model.addAttribute("atr_accountsList", accountService.getAll());
 
@@ -37,6 +38,7 @@ public class AdminAccountController {
     }
 
     @GetMapping(path = "/toggleLock")
+    @PreAuthorize(value = "hasAnyRole('ACCOUNT_MANAGER','ADMIN')")
     public String toggleLock(@RequestParam(name = "accountId") Long accountId) {
         accountService.toggleLock(accountId);
 
@@ -44,6 +46,7 @@ public class AdminAccountController {
     }
 
     @GetMapping(path = "/remove")
+    @PreAuthorize(value = "hasAnyRole('ACCOUNT_REMOVER','ADMIN')")
     public String remove(@RequestParam(name = "accountId") Long deletedId) {
         accountService.remove(deletedId);
 
@@ -51,6 +54,7 @@ public class AdminAccountController {
     }
 
     @GetMapping(path = "/resetPassword")
+    @PreAuthorize(value = "hasAnyRole('ADMIN')")
     public String resetPasword(Model model, @RequestParam(name = "accountId") Long accountResetedPasswordId) {
         Optional<Account> optionalAccount = accountService.findById(accountResetedPasswordId);
         if (optionalAccount.isPresent()) {
@@ -62,6 +66,7 @@ public class AdminAccountController {
     }
 
     @PostMapping(path = "/resetPassword")
+    @PreAuthorize(value = "hasAnyRole('ADMIN')")
     public String resetPassword(AccountResetPasswordRequest request) {
         accountService.resetPassword(request);
 
@@ -69,6 +74,7 @@ public class AdminAccountController {
     }
 
     @GetMapping(path = "/editRoles")
+    @PreAuthorize(value = "hasAnyRole('ADMIN')")
     public String editRoles(Model model, @RequestParam(name = "accountId") Long accountEditedRolesId) {
         Optional<Account> optionalAccount = accountService.findById(accountEditedRolesId);
         if (optionalAccount.isPresent()) {
@@ -83,6 +89,7 @@ public class AdminAccountController {
     }
 
     @PostMapping(path = "/editRoles")
+    @PreAuthorize(value = "hasAnyRole('ADMIN')")
     public String editRoles(Long accountId, HttpServletRequest request) {
         accountService.editRoles(accountId, request);
 

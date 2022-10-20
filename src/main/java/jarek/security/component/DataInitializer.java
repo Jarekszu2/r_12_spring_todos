@@ -30,6 +30,8 @@ public class DataInitializer implements ApplicationListener<ContextRefreshedEven
     public void onApplicationEvent(ContextRefreshedEvent event) {
         addDefaultRile("USER");
         addDefaultRile("ADMIN");
+        addDefaultRile("ACCOUNT_MANAGER");
+        addDefaultRile("ACCOUNT_REMOVER");
 
         addDefaultUser("admin", "admin", "ADMIN", "USER");
         addDefaultUser("user", "user", "USER");
